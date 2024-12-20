@@ -132,54 +132,57 @@ void RemoveMount(object oPC)
 {
 // only play sound and visuals if already mounted
 // don't play it for non-PCs as they will do it all at the same time. its very loud :)
-    if (GetIsMounted(oPC) && GetIsPC(oPC))
+    if (GetIsMounted(oPC))
     {
-        PlaySound("c_horse_slct");
-
-        ApplyEffectAtLocation(DURATION_TYPE_INSTANT, EffectVisualEffect(VFX_FNF_SUMMON_MONSTER_1), GetLocation(oPC));
-
-        object oHench = GetFirstFactionMember(oPC, FALSE);
-
-        while (GetIsObjectValid(oHench))
+        if (GetIsPC(oPC))
         {
-            if (GetAssociateType(oHench) == ASSOCIATE_TYPE_HENCHMAN && GetMaster(oHench) == oPC && GetIsMounted(oHench))
+            PlaySound("c_horse_slct");
+
+            ApplyEffectAtLocation(DURATION_TYPE_INSTANT, EffectVisualEffect(VFX_FNF_SUMMON_MONSTER_1), GetLocation(oPC));
+
+            object oHench = GetFirstFactionMember(oPC, FALSE);
+
+            while (GetIsObjectValid(oHench))
             {
-                RemoveMount(oHench);
+                if (GetAssociateType(oHench) == ASSOCIATE_TYPE_HENCHMAN && GetMaster(oHench) == oPC && GetIsMounted(oHench))
+                {
+                    RemoveMount(oHench);
+                }
+
+                oHench = GetNextFactionMember(oPC, FALSE);
             }
-
-            oHench = GetNextFactionMember(oPC, FALSE);
         }
-    }
 
-    switch (GetRacialType(oPC))
-    {
-        case RACIAL_TYPE_DWARF: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_DWARF); break;
-        case RACIAL_TYPE_ELF: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_ELF); break;
-        case RACIAL_TYPE_GNOME: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_GNOME); break;
-        case RACIAL_TYPE_HALFLING: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_HALFLING); break;
-        case RACIAL_TYPE_HALFELF: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_HALF_ELF); break;
-        case RACIAL_TYPE_HALFORC: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_HALF_ORC); break;
-        case RACIAL_TYPE_HUMAN: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_HUMAN); break;
-    }
+        switch (GetRacialType(oPC))
+        {
+            case RACIAL_TYPE_DWARF: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_DWARF); break;
+            case RACIAL_TYPE_ELF: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_ELF); break;
+            case RACIAL_TYPE_GNOME: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_GNOME); break;
+            case RACIAL_TYPE_HALFLING: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_HALFLING); break;
+            case RACIAL_TYPE_HALFELF: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_HALF_ELF); break;
+            case RACIAL_TYPE_HALFORC: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_HALF_ORC); break;
+            case RACIAL_TYPE_HUMAN: SetCreatureAppearanceType(oPC, APPEARANCE_TYPE_HUMAN); break;
+        }
 
-    int nPheno = GetPhenoType(oPC);
-    if (nPheno == 0 || nPheno == 3) {SetPhenoType(0, oPC);}
-    else if (nPheno == 5 || nPheno == 2) {SetPhenoType(2, oPC);}
+        int nPheno = GetPhenoType(oPC);
+        if (nPheno == 0 || nPheno == 3) {SetPhenoType(0, oPC);}
+        else if (nPheno == 5 || nPheno == 2) {SetPhenoType(2, oPC);}
 
-    SetCreatureTailType(0, oPC);
+        SetCreatureTailType(0, oPC);
 
-    SetFootstepType(FOOTSTEP_TYPE_DEFAULT, oPC);
-    DetermineHorseEffects(oPC);
-    
-    // Fix for disappearing cloaks after dismount - thanks, Taro
-    // The local int stuff should avoid cloaks getting set hidden forever if players manage to log out in this window or similar
-    object oCloak = GetItemInSlot(INVENTORY_SLOT_CLOAK, oPC);
-    if (!GetHiddenWhenEquipped(oCloak) || GetLocalInt(oCloak, "dismount_fix"))
-    {
-        DelayCommand(0.5, SetHiddenWhenEquipped(oCloak, TRUE));
-        SetLocalInt(oCloak, "dismount_fix", 1);
-        DelayCommand(1.0, SetHiddenWhenEquipped(oCloak, FALSE));
-        DelayCommand(1.1, DeleteLocalInt(oCloak, "dismount_fix"));
+        SetFootstepType(FOOTSTEP_TYPE_DEFAULT, oPC);
+        DetermineHorseEffects(oPC);
+        
+        // Fix for disappearing cloaks after dismount - thanks, Taro
+        // The local int stuff should avoid cloaks getting set hidden forever if players manage to log out in this window or similar
+        object oCloak = GetItemInSlot(INVENTORY_SLOT_CLOAK, oPC);
+        if (!GetHiddenWhenEquipped(oCloak) || GetLocalInt(oCloak, "dismount_fix"))
+        {
+            DelayCommand(0.5, SetHiddenWhenEquipped(oCloak, TRUE));
+            SetLocalInt(oCloak, "dismount_fix", 1);
+            DelayCommand(1.0, SetHiddenWhenEquipped(oCloak, FALSE));
+            DelayCommand(1.1, DeleteLocalInt(oCloak, "dismount_fix"));
+        }
     }
 }
 
