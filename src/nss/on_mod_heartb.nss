@@ -293,6 +293,7 @@ void DoRevive(object oDead)
                  if (nNoMasterCount >= MAX_NO_MASTER_COUNT)
                  {
                      ApplyEffectAtLocation(DURATION_TYPE_INSTANT, EffectVisualEffect(VFX_IMP_RESTORATION), lLocation);
+                     AssignCommand(oDead, SetIsDestroyable(TRUE));
                      ClearMaster(oDead);
                      DestroyObject(oDead);
                      // Delete their store if it exists or it will be floating around in memory until restart
